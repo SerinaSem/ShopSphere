@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
-from .models import Product, Cart, CartItem
+from .models import Product, Cart, CartItem, Category
 
 
 # =========================
@@ -9,16 +9,22 @@ from .models import Product, Cart, CartItem
 # =========================
 def home(request):
     products = Product.objects.all()
+    categories = Category.objects.all()
 
-    cart_count = 0
-    if request.user.is_authenticated:
-        cart_count = get_cart_count(request.user)
+    query = request.GET.get('q')
+    selected_category = request.GET.get('category')
+
+    if query:
+        products = products.filter(name__icontains=query)
+
+    if selected_category and selected_category != "":
+        products = products.filter(category_id=selected_category)
 
     return render(request, 'shop/home.html', {
         'products': products,
-        'cart_count': cart_count
+        'categories': categories,
+        'selected_category': selected_category
     })
-
 
 # =========================
 # PRODUCT DETAIL
@@ -110,3 +116,27 @@ def get_cart_count(user):
     cart, created = Cart.objects.get_or_create(user=user)
     items = CartItem.objects.filter(cart=cart)
     return sum(item.quantity for item in items)
+
+
+# =========================
+# FILTRE PAR CATÉGORIE
+# =========================
+def home(request):
+    query = request.GET.get('q')
+    category_id = request.GET.get('category')
+
+    products = Product.objects.all()
+
+    if query:
+        products = products.filter(name__icontains=query)
+
+    if category_id:
+        products = products.filter(category_id=category_id)
+
+    categories = Category.objects.all()
+
+    return render(request, 'shop/home.html', {
+        'products': products,
+        'categories': categories
+    })
+

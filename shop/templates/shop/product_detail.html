@@ -1,68 +1,109 @@
 {% load static %}
 <!DOCTYPE html>
-<html>
+<html lang="fr">
+
 <head>
-    <title>Détail produit</title>
+    <meta charset="UTF-8">
+    <title>{{ product.name }}</title>
 
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <!-- CSS perso -->
+    <!-- CSS -->
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 
 <body>
 
-<div class="container mt-5">
-    <div class="row">
+    <!-- NAVBAR -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
 
-        <!-- IMAGE -->
-        <div class="col-md-6">
-            {% if product.image %}
-                <img src="{{ product.image.url }}" class="img-fluid product-detail-image">
-            {% endif %}
-        </div>
+            <!-- LOGO -->
+            <a class="navbar-brand" href="{% url 'home' %}">
+                E-commerce
+            </a>
 
-        <!-- INFOS -->
-        <div class="col-md-6">
+            <!-- BARRE DE RECHERCHE -->
+            <form method="GET" action="{% url 'home' %}" class="d-flex mx-3">
+                <input type="text" name="q" class="form-control me-2" placeholder="Rechercher...">
+                <button class="btn btn-outline-light" type="submit">
+                    Rechercher
+                </button>
+            </form>
 
-            <h1>{{ product.name }}</h1>
+            <!-- PARTIE DROITE -->
+            <div class="ms-auto d-flex align-items-center">
 
-            {% if product.description %}
-                <p>{{ product.description }}</p>
-            {% else %}
-                <p class="text-muted">Aucune description disponible</p>
-            {% endif %}
-
-            <h3>{{ product.price }} €</h3>
-
-            {% if product.category %}
-                <p>Catégorie : {{ product.category.name }}</p>
-            {% endif %}
-
-            <!-- BOUTONS -->
-            <div class="mt-4">
+                <a href="{% url 'cart_detail' %}" class="btn btn-outline-light btn-sm me-3">
+                    Panier
+                </a>
 
                 {% if user.is_authenticated %}
+                <span class="text-white me-3">
+                    Bonjour {{ user.username }}
+                </span>
+
+                <form action="{% url 'logout' %}" method="post">
+                    {% csrf_token %}
+                    <button class="btn btn-outline-light btn-sm">
+                        Logout
+                    </button>
+                </form>
+                {% else %}
+                <a href="{% url 'login' %}" class="btn btn-outline-light btn-sm me-2">
+                    Se connecter
+                </a>
+                {% endif %}
+
+            </div>
+        </div>
+    </nav>
+
+    <!-- CONTENU -->
+    <div class="container mt-5">
+        <div class="row">
+
+            <!-- IMAGE -->
+            <div class="col-md-6">
+                {% if product.image %}
+                <img src="{{ product.image.url }}" class="img-fluid">
+                {% endif %}
+            </div>
+
+            <!-- INFOS -->
+            <div class="col-md-6">
+                <h1>{{ product.name }}</h1>
+
+                <p>{{ product.description }}</p>
+
+                <h3>{{ product.price }} €</h3>
+
+                <p>Catégorie : {{ product.category.name }}</p>
+
+                <!-- ACTIONS -->
+                <div class="mt-4 d-flex gap-2">
+
+                    {% if user.is_authenticated %}
                     <a href="{% url 'add_to_cart' product.id %}" class="btn btn-warning">
                         Ajouter au panier
                     </a>
-                {% else %}
+                    {% else %}
                     <a href="{% url 'login' %}" class="btn btn-warning">
-                        Se connecter pour acheter
+                        Connectez-vous
                     </a>
-                {% endif %}
+                    {% endif %}
 
-                <a href="{% url 'home' %}" class="btn btn-secondary ms-2">
-                    Retour
-                </a>
+                    <a href="{% url 'home' %}" class="btn btn-secondary">
+                        Retour
+                    </a>
 
+                </div>
             </div>
 
         </div>
-
     </div>
-</div>
 
 </body>
+
 </html>

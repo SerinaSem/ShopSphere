@@ -34,3 +34,8 @@ class CartItem(models.Model):
 
     def total_price(self):
         return self.product.price * self.quantity
+    
+from decimal import Decimal
+
+def total_price(self):
+    return round(self.product.price * self.quantity, 2)
